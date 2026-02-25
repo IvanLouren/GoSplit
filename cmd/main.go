@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/IvanLouren/GoSplit/internal/auth"
 	"github.com/IvanLouren/GoSplit/pkg/database"
 	"github.com/joho/godotenv"
 )
@@ -21,6 +22,14 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(`{"status":"ok"}`))
 	})
+
+	// init auths
+	authService := auth.NewService(database.DB)
+	authHandler := auth.NewHandler(authService)
+
+	// routes
+	mux.HandleFunc("POST /api/auth/register", authHandler.Register)
+	mux.HandleFunc("POST /api/auth/login", authHandler.Login)
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {
