@@ -96,16 +96,23 @@ func (s *Service) UpdateGroup(groupID uuid.UUID, name string) (*models.Group, er
 }
 
 func (s *Service) DeleteGroup(groupID uuid.UUID) error {
-
 	tx, err := s.db.Begin()
 	if err != nil {
 		return err
 	}
 	defer tx.Rollback()
+
+	// delete members first, then the group
+	_, err = tx.Exec(`DELETE FROM group_members WHERE group_id = $1`, groupID)
+	if err != nil {
+		return err
+	}
+
 	_, err = tx.Exec(`DELETE FROM groups WHERE id = $1`, groupID)
 	if err != nil {
 		return err
 	}
+
 	return tx.Commit()
 }
 

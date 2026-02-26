@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/IvanLouren/GoSplit/internal/auth"
+	"github.com/IvanLouren/GoSplit/internal/groups"
 	"github.com/IvanLouren/GoSplit/pkg/database"
+	"github.com/IvanLouren/GoSplit/pkg/middleware"
 	"github.com/joho/godotenv"
 )
 
@@ -27,9 +29,22 @@ func main() {
 	authService := auth.NewService(database.DB)
 	authHandler := auth.NewHandler(authService)
 
-	// routes
+	// init groups
+	groupService := groups.NewService(database.DB)
+	groupHandler := groups.NewHandler(groupService)
+
+	// auth routes
 	mux.HandleFunc("POST /api/auth/register", authHandler.Register)
 	mux.HandleFunc("POST /api/auth/login", authHandler.Login)
+
+	// group routes
+	mux.Handle("POST /api/groups", middleware.AuthRequired(http.HandlerFunc(groupHandler.CreateGroup)))
+	mux.Handle("GET /api/groups", middleware.AuthRequired(http.HandlerFunc(groupHandler.GetGroups)))
+	mux.Handle("GET /api/groups/{id}", middleware.AuthRequired(http.HandlerFunc(groupHandler.GetGroup)))
+	mux.Handle("PUT /api/groups/{id}", middleware.AuthRequired(http.HandlerFunc(groupHandler.UpdateGroup)))
+	mux.Handle("DELETE /api/groups/{id}", middleware.AuthRequired(http.HandlerFunc(groupHandler.DeleteGroup)))
+	mux.Handle("POST /api/groups/{id}/members", middleware.AuthRequired(http.HandlerFunc(groupHandler.AddMember)))
+	mux.Handle("DELETE /api/groups/{id}/members/{user_id}", middleware.AuthRequired(http.HandlerFunc(groupHandler.RemoveMember)))
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {
