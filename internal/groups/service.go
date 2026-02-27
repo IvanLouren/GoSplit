@@ -48,19 +48,12 @@ func (s *Service) CreateGroup(name string, createdBy uuid.UUID) (*models.Group, 
 }
 
 func (s *Service) GetGroups(userID uuid.UUID) ([]models.Group, error) {
-
-	tx, err := s.db.Begin()
-	if err != nil {
-		return nil, err
-	}
-	defer tx.Rollback()
-
-	rows, err := tx.Query(`
-		SELECT g.id, g.name, g.created_by, g.created_at
-		FROM groups g
-		JOIN group_members gm ON g.id = gm.group_id
-		WHERE gm.user_id = $1
-	`, userID)
+	rows, err := s.db.Query(`
+        SELECT g.id, g.name, g.created_by, g.created_at
+        FROM groups g
+        JOIN group_members gm ON g.id = gm.group_id
+        WHERE gm.user_id = $1
+    `, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -118,29 +111,19 @@ func (s *Service) DeleteGroup(groupID uuid.UUID) error {
 
 func (s *Service) AddMember(groupID, userID uuid.UUID) error {
 
-	tx, err := s.db.Begin()
-	if err != nil {
-		return err
-	}
-	defer tx.Rollback()
-	_, err = tx.Exec(`INSERT INTO group_members (id, group_id, user_id, joined_at) VALUES ($1, $2, $3, $4)`,
+	_, err := s.db.Exec(`INSERT INTO group_members (id, group_id, user_id, joined_at) VALUES ($1, $2, $3, $4)`,
 		uuid.New(), groupID, userID, time.Now())
 	if err != nil {
 		return err
 	}
-	return tx.Commit()
+	return nil
 }
 
 func (s *Service) RemoveMember(groupID, userID uuid.UUID) error {
 
-	tx, err := s.db.Begin()
+	_, err := s.db.Exec(`DELETE FROM group_members WHERE group_id = $1 AND user_id = $2`, groupID, userID)
 	if err != nil {
 		return err
 	}
-	defer tx.Rollback()
-	_, err = tx.Exec(`DELETE FROM group_members WHERE group_id = $1 AND user_id = $2`, groupID, userID)
-	if err != nil {
-		return err
-	}
-	return tx.Commit()
+	return nil
 }
