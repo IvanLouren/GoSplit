@@ -28,7 +28,7 @@ func (s *Service) CreateExpense(groupID uuid.UUID, paidBy uuid.UUID, description
 	defer tx.Rollback()
 
 	var expense models.Expense
-	err = tx.QueryRow(`INSERT INTO expenses (group_id, paid_by, description, amount) VALUES ($1, $2, $3, $4) RETURNING id, group_id, paid_by, description, amount`, groupID, paidBy, description, amount).Scan(&expense.ID, &expense.GroupID, &expense.PaidBy, &expense.Description, &expense.Amount)
+	err = tx.QueryRow(`INSERT INTO expenses (group_id, paid_by, description, amount) VALUES ($1, $2, $3, $4) RETURNING id, group_id, paid_by, description, amount, created_at`, groupID, paidBy, description, amount).Scan(&expense.ID, &expense.GroupID, &expense.PaidBy, &expense.Description, &expense.Amount, &expense.CreatedAt)
 	if err != nil {
 		return models.Expense{}, err
 	}
@@ -48,7 +48,7 @@ func (s *Service) CreateExpense(groupID uuid.UUID, paidBy uuid.UUID, description
 }
 
 func (s *Service) GetExpenses(groupID uuid.UUID) ([]models.Expense, error) {
-	expenses, err := s.db.Query(`SELECT id, group_id, paid_by, description, amount FROM expenses WHERE group_id = $1`, groupID)
+	expenses, err := s.db.Query(`SELECT id, group_id, paid_by, description, amount, created_at FROM expenses WHERE group_id = $1`, groupID)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func (s *Service) GetExpenses(groupID uuid.UUID) ([]models.Expense, error) {
 	var result []models.Expense
 	for expenses.Next() {
 		var expense models.Expense
-		err = expenses.Scan(&expense.ID, &expense.GroupID, &expense.PaidBy, &expense.Description, &expense.Amount)
+		err = expenses.Scan(&expense.ID, &expense.GroupID, &expense.PaidBy, &expense.Description, &expense.Amount, &expense.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -69,8 +69,8 @@ func (s *Service) GetExpenses(groupID uuid.UUID) ([]models.Expense, error) {
 
 func (s *Service) GetExpense(expenseID uuid.UUID) (models.Expense, error) {
 	var expense models.Expense
-	err := s.db.QueryRow(`SELECT id, group_id, paid_by, description, amount FROM expenses WHERE id = $1`, expenseID).
-		Scan(&expense.ID, &expense.GroupID, &expense.PaidBy, &expense.Description, &expense.Amount)
+	err := s.db.QueryRow(`SELECT id, group_id, paid_by, description, amount, created_at FROM expenses WHERE id = $1`, expenseID).
+		Scan(&expense.ID, &expense.GroupID, &expense.PaidBy, &expense.Description, &expense.Amount, &expense.CreatedAt)
 	if err != nil {
 		return models.Expense{}, err
 	}
