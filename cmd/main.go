@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/IvanLouren/GoSplit/internal/auth"
+	"github.com/IvanLouren/GoSplit/internal/expenses"
 	"github.com/IvanLouren/GoSplit/internal/groups"
 	"github.com/IvanLouren/GoSplit/pkg/database"
 	"github.com/IvanLouren/GoSplit/pkg/middleware"
@@ -33,6 +34,10 @@ func main() {
 	groupService := groups.NewService(database.DB)
 	groupHandler := groups.NewHandler(groupService)
 
+	// init expenses
+	expenseService := expenses.NewService(database.DB)
+	expenseHandler := expenses.NewHandler(expenseService)
+
 	// auth routes
 	mux.HandleFunc("POST /api/auth/register", authHandler.Register)
 	mux.HandleFunc("POST /api/auth/login", authHandler.Login)
@@ -45,6 +50,12 @@ func main() {
 	mux.Handle("DELETE /api/groups/{id}", middleware.AuthRequired(http.HandlerFunc(groupHandler.DeleteGroup)))
 	mux.Handle("POST /api/groups/{id}/members", middleware.AuthRequired(http.HandlerFunc(groupHandler.AddMember)))
 	mux.Handle("DELETE /api/groups/{id}/members/{user_id}", middleware.AuthRequired(http.HandlerFunc(groupHandler.RemoveMember)))
+
+	// expense routes
+	mux.Handle("POST /api/groups/{id}/expenses", middleware.AuthRequired(http.HandlerFunc(expenseHandler.CreateExpense)))
+	mux.Handle("GET /api/groups/{id}/expenses", middleware.AuthRequired(http.HandlerFunc(expenseHandler.GetExpenses)))
+	mux.Handle("GET /api/groups/{id}/expenses/{expenseId}", middleware.AuthRequired(http.HandlerFunc(expenseHandler.GetExpense)))
+	mux.Handle("DELETE /api/groups/{id}/expenses/{expenseId}", middleware.AuthRequired(http.HandlerFunc(expenseHandler.DeleteExpense)))
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {

@@ -84,7 +84,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	groups, err := h.service.GetGroup(groupID)
+	group, err := h.service.GetGroup(groupID)
 
 	if err == sql.ErrNoRows {
 		http.Error(w, "group not found", http.StatusNotFound)
@@ -98,7 +98,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(groups)
+	json.NewEncoder(w).Encode(group)
 }
 
 func (h *Handler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
@@ -144,11 +144,6 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.service.DeleteGroup(groupID)
-	if err == sql.ErrNoRows {
-		http.Error(w, "group not found", http.StatusNotFound)
-		return
-	}
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
