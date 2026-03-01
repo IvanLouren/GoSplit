@@ -8,6 +8,7 @@ import (
 	"github.com/IvanLouren/GoSplit/internal/auth"
 	"github.com/IvanLouren/GoSplit/internal/expenses"
 	"github.com/IvanLouren/GoSplit/internal/groups"
+	"github.com/IvanLouren/GoSplit/internal/settlements"
 	"github.com/IvanLouren/GoSplit/pkg/database"
 	"github.com/IvanLouren/GoSplit/pkg/middleware"
 	"github.com/joho/godotenv"
@@ -38,6 +39,10 @@ func main() {
 	expenseService := expenses.NewService(database.DB)
 	expenseHandler := expenses.NewHandler(expenseService)
 
+	// init settlements
+	settlementService := settlements.NewService(database.DB)
+	settlementHandler := settlements.NewHandler(settlementService)
+
 	// auth routes
 	mux.HandleFunc("POST /api/auth/register", authHandler.Register)
 	mux.HandleFunc("POST /api/auth/login", authHandler.Login)
@@ -56,6 +61,10 @@ func main() {
 	mux.Handle("GET /api/groups/{id}/expenses", middleware.AuthRequired(http.HandlerFunc(expenseHandler.GetExpenses)))
 	mux.Handle("GET /api/groups/{id}/expenses/{expenseId}", middleware.AuthRequired(http.HandlerFunc(expenseHandler.GetExpense)))
 	mux.Handle("DELETE /api/groups/{id}/expenses/{expenseId}", middleware.AuthRequired(http.HandlerFunc(expenseHandler.DeleteExpense)))
+
+	// settlement routes
+	mux.Handle("POST /api/groups/{id}/settlements", middleware.AuthRequired(http.HandlerFunc(settlementHandler.CreateSettlement)))
+	mux.Handle("GET /api/groups/{id}/settlements", middleware.AuthRequired(http.HandlerFunc(settlementHandler.GetSettlements)))
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {
