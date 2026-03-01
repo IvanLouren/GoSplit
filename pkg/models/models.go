@@ -52,3 +52,8 @@ type Settlement struct {
 	Amount    float64   `json:"amount"`
 	CreatedAt time.Time `json:"created_at"`
 }
+
+type Balance struct {
+	UserID  uuid.UUID `json:"user_id"`
+	Balance float64   `json:"balance"`
+}

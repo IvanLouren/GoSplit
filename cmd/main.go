@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/IvanLouren/GoSplit/internal/auth"
+	"github.com/IvanLouren/GoSplit/internal/balances"
 	"github.com/IvanLouren/GoSplit/internal/expenses"
 	"github.com/IvanLouren/GoSplit/internal/groups"
 	"github.com/IvanLouren/GoSplit/internal/settlements"
@@ -43,6 +44,10 @@ func main() {
 	settlementService := settlements.NewService(database.DB)
 	settlementHandler := settlements.NewHandler(settlementService)
 
+	// init balances
+	balanceService := balances.NewService(database.DB)
+	balanceHandler := balances.NewHandler(balanceService)
+
 	// auth routes
 	mux.HandleFunc("POST /api/auth/register", authHandler.Register)
 	mux.HandleFunc("POST /api/auth/login", authHandler.Login)
@@ -65,6 +70,9 @@ func main() {
 	// settlement routes
 	mux.Handle("POST /api/groups/{id}/settlements", middleware.AuthRequired(http.HandlerFunc(settlementHandler.CreateSettlement)))
 	mux.Handle("GET /api/groups/{id}/settlements", middleware.AuthRequired(http.HandlerFunc(settlementHandler.GetSettlements)))
+
+	// balance routes
+	mux.Handle("GET /api/groups/{id}/balances", middleware.AuthRequired(http.HandlerFunc(balanceHandler.GetBalances)))
 
 	port := os.Getenv("APP_PORT")
 	if port == "" {
