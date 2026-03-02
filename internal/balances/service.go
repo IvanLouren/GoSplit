@@ -27,7 +27,6 @@ func (s *Service) GetBalances(groupID uuid.UUID) ([]models.Balance, error) {
 			   JOIN expenses ON expenses.id = expense_splits.expense_id
 			   WHERE expenses.group_id = $1
 			    UNION ALL
-    		-- settlements paid by user (negative)
 			   SELECT paid_by as user_id, -amount
 			   FROM settlements
 			   WHERE group_id =$1
