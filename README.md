@@ -7,7 +7,7 @@ A REST API for splitting expenses between groups — a Splitwise clone built as 
 - **Language:** Go (standard library only — `net/http`, `database/sql`)
 - **Database:** PostgreSQL
 - **Auth:** JWT (`golang-jwt/jwt`)
-- **Other:** `pgx` driver, `google/uuid`, `godotenv`
+- **Other:** `lib/pq` driver, `google/uuid`, `godotenv`
 - **Infra:** Docker, Docker Compose
 
 No Gin. No GORM.
