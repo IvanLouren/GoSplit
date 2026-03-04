@@ -21,8 +21,8 @@ var testDB *sql.DB
 func TestMain(m *testing.M) {
 	ctx := context.Background()
 
-	pgContainer, err := postgres.RunContainer(ctx,
-		testcontainers.WithImage("postgres:15-alpine"),
+	pgContainer, err := postgres.Run(ctx,
+		"postgres:15-alpine",
 		postgres.WithDatabase("gosplit_test"),
 		postgres.WithUsername("postgres"),
 		postgres.WithPassword("postgres"),

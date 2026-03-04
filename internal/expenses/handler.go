@@ -118,7 +118,7 @@ func (h *Handler) GetExpense(w http.ResponseWriter, r *http.Request) {
 	expenseIDStr := r.PathValue("expenseId")
 	expenseID, err := uuid.Parse(expenseIDStr)
 	if err != nil {
-		http.Error(w, "Invalide expense ID", http.StatusBadRequest)
+		http.Error(w, "Invalid expense ID", http.StatusBadRequest)
 		return
 	}
 
