@@ -111,7 +111,7 @@ func TestGetGroups(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to parse userID: %s", err)
 	}
-	// TODO: call service.GetGroups(userID)
+
 	service := groups.NewService(testDB)
 	result, err := service.GetGroups(parsedUserID)
 	if err != nil {
@@ -219,23 +219,105 @@ func TestDeleteGroup(t *testing.T) {
 		t.Fatalf("failed to delete group: %s", err)
 	}
 	_, err = service.GetGroup(parsedGroupID)
-	if err != nil {
+	if err == nil {
 		t.Fatalf("expected error after delete, got nil")
 	}
 }
 
 func TestAddMember(t *testing.T) {
-	// TODO: create two test users (owner and new member)
-	// TODO: create a group with the owner via the service
-	// TODO: call service.AddMember(group.ID, memberID)
-	// TODO: assert no error
-	// TODO: call service.GetGroups(memberID) and assert the group appears in the result
+	var userID string
+	err := testDB.QueryRow(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`,
+		"Test User 6", "test6@test.com", "hashedpassword").Scan(&userID)
+	if err != nil {
+		t.Fatalf("failed to insert user: %s", err)
+	}
+	var memberID string
+	err = testDB.QueryRow(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`,
+		"Test User 7", "test7@test.com", "hashedpassword").Scan(&memberID)
+	if err != nil {
+		t.Fatalf("failed to insert user: %s", err)
+	}
+
+	var groupID string
+	err = testDB.QueryRow(`INSERT INTO groups (name, created_by) VALUES ($1, $2) RETURNING id`,
+		"Trip to Rome", userID).Scan(&groupID)
+	if err != nil {
+		t.Fatalf("failed to insert group: %s", err)
+	}
+
+	parsedMemberID, err := uuid.Parse(memberID)
+	if err != nil {
+		t.Fatalf("failed to parse userID: %s", err)
+	}
+
+	parsedGroupID, err := uuid.Parse(groupID)
+	if err != nil {
+		t.Fatalf("failed to parse groupID: %s", err)
+	}
+
+	service := groups.NewService(testDB)
+	err = service.AddMember(parsedGroupID, parsedMemberID)
+	if err != nil {
+		t.Fatalf("failed to add member: %s", err)
+	}
+
+	groupMember, err := service.GetGroups(parsedMemberID)
+	if err != nil {
+		t.Fatalf("failed to get groups: %s", err)
+	}
+	if len(groupMember) == 0 {
+		t.Errorf("expected member to be in at least 1 group, got 0")
+	}
+
 }
 
 func TestRemoveMember(t *testing.T) {
-	// TODO: create two test users (owner and member)
-	// TODO: create a group with the owner, then call service.AddMember for the second user
-	// TODO: call service.RemoveMember(group.ID, memberID)
-	// TODO: assert no error
-	// TODO: call service.GetGroups(memberID) and assert the group no longer appears
+	var userID string
+	err := testDB.QueryRow(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`,
+		"Test User 8", "test8@test.com", "hashedpassword").Scan(&userID)
+	if err != nil {
+		t.Fatalf("failed to insert user: %s", err)
+	}
+	var memberID string
+	err = testDB.QueryRow(`INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id`,
+		"Test User 9", "test9@test.com", "hashedpassword").Scan(&memberID)
+	if err != nil {
+		t.Fatalf("failed to insert user: %s", err)
+	}
+
+	var groupID string
+	err = testDB.QueryRow(`INSERT INTO groups (name, created_by) VALUES ($1, $2) RETURNING id`,
+		"Trip to Rome", userID).Scan(&groupID)
+	if err != nil {
+		t.Fatalf("failed to insert group: %s", err)
+	}
+
+	parsedMemberID, err := uuid.Parse(memberID)
+	if err != nil {
+		t.Fatalf("failed to parse userID: %s", err)
+	}
+
+	parsedGroupID, err := uuid.Parse(groupID)
+	if err != nil {
+		t.Fatalf("failed to parse groupID: %s", err)
+	}
+
+	service := groups.NewService(testDB)
+	err = service.AddMember(parsedGroupID, parsedMemberID)
+	if err != nil {
+		t.Fatalf("failed to add member: %s", err)
+	}
+
+	err = service.RemoveMember(parsedGroupID, parsedMemberID)
+	if err != nil {
+		t.Fatalf("failed to remove member: %s", err)
+	}
+
+	groupMember, err := service.GetGroups(parsedMemberID)
+	if err != nil {
+		t.Fatalf("failed to get groups: %s", err)
+	}
+	if len(groupMember) != 0 {
+		t.Errorf("expected member to be 0 group, got %d", len(groupMember))
+	}
 }
