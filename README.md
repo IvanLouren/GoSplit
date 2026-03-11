@@ -27,21 +27,27 @@ No Gin. No GORM.
 cmd/
   main.go                  # Entry point
 internal/
+internal/
   auth/
     handler.go             # POST /api/auth/register, POST /api/auth/login
     service.go
+    service_test.go        # TestRegister, TestLogin, TestLogin_WrongPassword, TestLogin_UserNotFound
   groups/
     handler.go             # CRUD + member management
     service.go
+    service_test.go        # TestCreateGroup, TestGetGroups, TestGetGroup, TestUpdateGroup, TestDeleteGroup, TestAddMember, TestRemoveMember
   expenses/
     handler.go             # CRUD + splits
     service.go
+    service_test.go        # TestCreateExpense, TestGetExpenses, TestGetExpense, TestDeleteExpense
   settlements/
     handler.go             # Create + list settlements
     service.go
+    service_test.go        # TestCreateSettlement, TestGetSettlements
   balances/
     handler.go             # GET /api/groups/{id}/balances
     service.go
+    service_test.go        # TestGetBalances
 migrations/
   001_init.sql             # All 6 tables
 pkg/
@@ -137,3 +143,27 @@ balance = expenses paid by user
 
 A **positive** balance means the user is owed money.
 A **negative** balance means the user owes money.
+
+## Testing
+
+Tests run against real PostgreSQL instances using `testcontainers-go`. Each package spins up an isolated Postgres container, runs the migrations, executes the tests, and tears the container down automatically.
+
+### Prerequisites
+
+- Docker (required for testcontainers)
+
+### Run tests
+
+Run all tests with:
+
+```bash
+go test ./internal/...
+```
+
+You can also run tests for a single package, e.g.:
+
+```bash
+go test ./internal/groups -v
+```
+
+The test suites cover the service layer behaviour for `auth`, `groups`, `expenses`, `settlements` and `balances`.
