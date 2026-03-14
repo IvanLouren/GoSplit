@@ -22,6 +22,7 @@ import (
 	"github.com/IvanLouren/GoSplit/internal/expenses"
 	"github.com/IvanLouren/GoSplit/internal/groups"
 	"github.com/IvanLouren/GoSplit/internal/settlements"
+	"github.com/IvanLouren/GoSplit/internal/users"
 	"github.com/IvanLouren/GoSplit/pkg/database"
 	"github.com/IvanLouren/GoSplit/pkg/middleware"
 	"github.com/joho/godotenv"
@@ -61,6 +62,10 @@ func main() {
 	balanceService := balances.NewService(database.DB)
 	balanceHandler := balances.NewHandler(balanceService)
 
+	//init users
+	userService := users.NewService(database.DB)
+	userHandler := users.NewHandler(userService)
+
 	// auth routes
 	mux.HandleFunc("POST /api/auth/register", authHandler.Register)
 	mux.HandleFunc("POST /api/auth/login", authHandler.Login)
@@ -87,6 +92,10 @@ func main() {
 
 	// balance routes
 	mux.Handle("GET /api/groups/{id}/balances", middleware.AuthRequired(http.HandlerFunc(balanceHandler.GetBalances)))
+
+	// user routes
+	mux.Handle("GET /api/users/me", middleware.AuthRequired(http.HandlerFunc(userHandler.GetMe)))
+	mux.Handle("PUT /api/users/me", middleware.AuthRequired(http.HandlerFunc(userHandler.UpdateMe)))
 
 	// swagger UI
 	mux.Handle("GET /swagger/", httpSwagger.WrapHandler)
