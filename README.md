@@ -7,7 +7,7 @@ A REST API for splitting expenses between groups — a Splitwise clone built as 
 - **Language:** Go (standard library only — `net/http`, `database/sql`)
 - **Database:** PostgreSQL
 - **Auth:** JWT (`golang-jwt/jwt`)
-- **Other:** `lib/pq` driver, `google/uuid`, `godotenv`
+- **Other:** `pgx` driver (`github.com/jackc/pgx/v5/stdlib`), `google/uuid`, `godotenv`
 - **Infra:** Docker, Docker Compose
 
 No Gin. No GORM.
@@ -181,3 +181,11 @@ go test ./internal/groups -v
 ```
 
 The test suites cover the service layer behaviour for `auth`, `groups`, `expenses`, `settlements`, `users` and `balances`.
+
+## CI
+
+GitHub Actions runs tests automatically on push and pull request:
+
+```bash
+go test ./internal/... -v
+```
