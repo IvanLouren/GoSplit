@@ -43,7 +43,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 
 	user, err := h.service.Register(req.Name, req.Email, req.Password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -71,7 +71,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 
 	token, err := h.service.Login(req.Email, req.Password)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
+		http.Error(w, "failed to process authentication", http.StatusInternalServerError)
 		return
 	}
 

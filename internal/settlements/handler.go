@@ -75,7 +75,7 @@ func (h *Handler) CreateSettlement(w http.ResponseWriter, r *http.Request) {
 
 	settlement, err := h.service.CreateSettlement(groupID, parsedID, parsedPaidTo, req.Amount)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -105,7 +105,7 @@ func (h *Handler) GetSettlements(w http.ResponseWriter, r *http.Request) {
 
 	settlements, err := h.service.GetSettlements(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 	if settlements == nil {

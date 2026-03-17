@@ -96,7 +96,7 @@ func (h *Handler) CreateExpense(w http.ResponseWriter, r *http.Request) {
 
 	expense, err := h.service.CreateExpense(groupID, parsedID, req.Description, req.Amount, splits)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -126,7 +126,7 @@ func (h *Handler) GetExpenses(w http.ResponseWriter, r *http.Request) {
 
 	expenses, err := h.service.GetExpenses(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 	if expenses == nil {
@@ -165,7 +165,7 @@ func (h *Handler) GetExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -240,7 +240,7 @@ func (h *Handler) UpdateExpense(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -269,7 +269,7 @@ func (h *Handler) DeleteExpense(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.DeleteExpense(expenseID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 

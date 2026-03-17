@@ -37,7 +37,7 @@ func (h *Handler) GetBalances(w http.ResponseWriter, r *http.Request) {
 
 	balances, err := h.service.GetBalances(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 

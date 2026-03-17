@@ -55,7 +55,7 @@ func (h *Handler) CreateGroup(w http.ResponseWriter, r *http.Request) {
 
 	group, err := h.service.CreateGroup(req.Name, parsedID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
@@ -83,7 +83,7 @@ func (h *Handler) GetGroups(w http.ResponseWriter, r *http.Request) {
 
 	groups, err := h.service.GetGroups(parsedID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -125,7 +125,7 @@ func (h *Handler) GetGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -172,7 +172,7 @@ func (h *Handler) UpdateGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -202,7 +202,7 @@ func (h *Handler) DeleteGroup(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.DeleteGroup(groupID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
@@ -242,7 +242,7 @@ func (h *Handler) AddMember(w http.ResponseWriter, r *http.Request) {
 	}
 	err = h.service.AddMember(groupID, userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
@@ -278,7 +278,7 @@ func (h *Handler) RemoveMember(w http.ResponseWriter, r *http.Request) {
 
 	err = h.service.RemoveMember(groupID, userID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
